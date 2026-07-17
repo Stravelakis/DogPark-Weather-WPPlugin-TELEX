@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "telex/block-telex-dog-park-weather",
+  "version": "0.1.0",
+  "title": "Dog Park Weather Rating",
+  "category": "widgets",
+  "icon": "pets",
+  "description": "Displays hourly weather forecast for a dog park with a 1-5 paw rating system, mitigations, and translatable UI.",
+  "example": {},
+  "attributes": {
+    "parkId": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "telex-dog-park-weather",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}
