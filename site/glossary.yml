@@ -1,0 +1,24 @@
+Gutenberg block:
+  eli5: A building block you click into a web page, like a Lego brick that does one job.
+  english: A piece of content you add to a WordPress page in the block editor. This plugin adds one block, the weather rating.
+  dev: A WordPress block-editor block; here a dynamic block rendered server-side by render.php.
+
+WP-Cron:
+  eli5: WordPress's little alarm clock that runs chores on a schedule.
+  english: WordPress's built-in scheduler. Here it refreshes the weather twice a day.
+  dev: WordPress pseudo-cron, triggered on page loads; schedules the twice-daily forecast refresh.
+
+Open-Meteo:
+  eli5: A free website that knows the weather.
+  english: A free weather service that needs no account or key. It is the default source.
+  dev: Open-Meteo forecast API; keyless; supplies hourly data plus sunrise and sunset.
+
+Lottie:
+  eli5: A tiny animated picture that can change colour.
+  english: A small animation file format. The plugin uses it for animated paw and weather icons.
+  dev: JSON-based vector animation format; recoloured at render time from the Appearance settings.
+
+Transient:
+  eli5: A note WordPress keeps for a while and then throws away.
+  english: Temporary saved data in WordPress. Here it holds each park's cached forecast.
+  dev: WordPress transient (cache entry with expiry) holding per-park weather.
