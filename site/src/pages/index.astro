@@ -2,61 +2,75 @@
 import DocsLayout from '../layouts/DocsLayout.astro';
 import VernacularPanels from '../components/VernacularPanels.astro';
 import FeatureCards from '../components/FeatureCards.astro';
+import Carousel from '../components/Carousel.astro';
+import LevelPicker from '../components/LevelPicker.astro';
 import Playground from '../components/Playground.astro';
 import ReviewStamp from '../components/ReviewStamp.astro';
 import Glossary from '../components/Glossary.astro';
 import { siteConfig } from '../../site.config.ts';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+// The version shown is read from the plugin file's own "Version:" header at
+// build time, so it cannot go stale. (Builds run from /site, repo root is "..".)
+let version = '';
+try {
+  const php = readFileSync(join(process.cwd(), '..', 'telex-dog-park-weather.php'), 'utf8');
+  version = php.match(/^\s*\*\s*Version:\s*(\S+)/m)?.[1] ?? '';
+} catch {}
 
 import { Content as Dev, frontmatter as devFm } from '../docs/dev.md';
 import { Content as Plain, frontmatter as plainFm } from '../docs/plain.md';
 import { Content as Eli5, frontmatter as eli5Fm } from '../docs/eli5.md';
 
 // One source: GUIDE.md / INSTALL.md copied in by scripts/sync-docs.mjs.
-const features = [
-  {
-    "icon": "🐾",
-    "title": "Paw rating, hour by hour",
-    "text": "A 1 to 5 paw score for every hour of today and tomorrow, built from live weather."
-  },
-  {
-    "icon": "🎚️",
-    "title": "You set what matters",
-    "text": "Weigh rain, wind, UV, temperature, cloud cover and darkness yourself. Two safety rules always apply."
-  },
-  {
-    "icon": "🌍",
-    "title": "Fully translatable",
-    "text": "Every visible string can be changed in Settings. Built and tested in Greek."
-  },
-  {
-    "icon": "🔑",
-    "title": "No API key",
-    "text": "Uses the free Open-Meteo service by default. Google Weather and OpenWeather are optional."
-  },
-  {
-    "icon": "📥",
-    "title": "Import parks from a sheet",
-    "text": "Bulk-add parks from a CSV or a public Google Sheet link. Re-running an import is safe."
-  },
-  {
-    "icon": "🧹",
-    "title": "Clean uninstall",
-    "text": "Deleting the plugin removes its settings, cached weather and scheduled jobs."
-  }
-];
-
 const sources = import.meta.glob<{ Content: any }>('../docs/source/*.md', { eager: true });
 const guide = sources['../docs/source/guide.md'];
 const install = sources['../docs/source/install.md'];
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const features = [
+  { icon: '🐾', title: 'A paw score for every hour', text: 'One to five paws for each hour of today and tomorrow. Hover the paws to see why an hour got its score.' },
+  { icon: '🎚️', title: 'You decide what matters', text: 'Six weights for rain, UV, wind, temperature, cloud and darkness. Mark a park as drained, shaded, sheltered or covered and that problem counts half.' },
+  { icon: '🔑', title: 'No account, no key', text: 'Weather comes from the free Open-Meteo service by default. Google Weather and OpenWeather are there if you bring your own key.' },
+  { icon: '🌍', title: 'Any language', text: 'Every word on the block can be changed in Settings. A hand-written Greek set is one click away.' },
+  { icon: '📥', title: 'Import parks from a sheet', text: 'Paste CSV or give a public Google Sheet link. Parks that already exist are never duplicated, so re-running is safe.' },
+  { icon: '⚡', title: 'Quick for visitors', text: 'The forecast is saved on your site and refreshed twice a day, so a page view does not normally trigger a live weather lookup.' },
+];
+
+const slides = [
+  { title: 'The block on a page', caption: 'Tomorrow, hour by hour. The banner quotes the best hour; paws show the score. Example park.', image: `${base}screens/slide-block.png`, alt: 'The Dog Park Weather Rating block showing Riverside Dog Park, with a pink banner, Today and Tomorrow tabs, and hourly rows with temperature and five-paw scores.' },
+  { title: 'Why this score?', caption: 'Hover or focus the paws of any hour: a small bubble gives the reason, here "After dark".', image: `${base}screens/slide-tooltip.png`, alt: 'The block with a dark bubble reading After dark above the paws of the 11:00 PM row.' },
+  { title: 'Pick a park in the editor', caption: 'Add the block, choose a park in the side panel, see a live preview.', image: `${base}screens/editor-block.png`, alt: 'The WordPress editor with the block selected and the Park Selection panel showing Riverside Dog Park, its coordinates and mitigations.' },
+  { title: 'Parks', caption: 'Name, coordinates and four tick boxes for what the park has going for it.', image: `${base}screens/settings-parks.png`, alt: 'Settings, Dog Park Weather, Parks tab: two parks with name, latitude, longitude and condition tick boxes.' },
+  { title: 'Import from a spreadsheet', caption: 'Paste CSV, or link a public Google Sheet. Existing parks are skipped.', image: `${base}screens/settings-import.png`, alt: 'The Import Parks from a spreadsheet panel, open, with a link box and a paste-CSV box.' },
+  { title: 'Weights', caption: 'How much each kind of weather can pull the score down. 0 turns it off.', image: `${base}screens/settings-weights.png`, alt: 'The Weights tab with an explanation box and numeric boxes for rain, UV and wind.' },
+  { title: 'Translations', caption: 'Change every word. Use the Greek preset or the auto-translate helper, then edit.', image: `${base}screens/settings-translations.png`, alt: 'The Translations tab with a Greek preset button, a language list and a Translate All button.' },
+  { title: 'Colours and look', caption: 'Colours, font and the block height.', image: `${base}screens/settings-appearance.png`, alt: 'The Appearance tab with colour fields for the header, banner and tabs.' },
+];
 ---
 <DocsLayout title="Overview" home>
-  <section class="hero reveal" id="top">
-    <span class="eyebrow">Docs</span>
+  <section class="frame hero reveal" id="top">
+    <span class="label">Docs{version ? ` · v${version}` : ''}</span>
     <h1 class="hero-title">{siteConfig.projectName}</h1>
     <p class="hero-sub">{siteConfig.description}</p>
+    <div class="btns">
+      {siteConfig.heroLinks.map((l) => (
+        <a class:list={['btn', { primary: l.primary }]} href={l.href}>{l.label}</a>
+      ))}
+    </div>
+    <div class="pills">
+      {siteConfig.heroPills.map((t) => (
+        <span class="pill"><i></i>{t}</span>
+      ))}
+    </div>
   </section>
 
-  <FeatureCards features={features} title="What the plugin does" />
+  <LevelPicker />
+
+  <FeatureCards features={features} title="What it does" />
+  <Carousel slides={slides} label="Screenshots" />
 
   <section class="doc-body reveal" id="docs" aria-label="Documentation" data-glossary>
     <VernacularPanels>
@@ -66,13 +80,14 @@ const install = sources['../docs/source/install.md'];
     </VernacularPanels>
   </section>
 
+  {/* No "reveal" on Install and Guide: it waits for part of a section to be on screen, which a long section never reaches (found on Video Forge, 18 Nov 2026). */}
   {install && (
-    <section class="doc-body doc-source reveal" id="install" aria-label="Install" data-glossary>
+    <section class="doc-body doc-source" id="install" aria-label="Install" data-glossary>
       <install.Content />
     </section>
   )}
   {guide && (
-    <section class="doc-body doc-source reveal" id="guide" aria-label="Guide" data-glossary>
+    <section class="doc-body doc-source" id="guide" aria-label="Guide" data-glossary>
       <guide.Content />
     </section>
   )}

@@ -1,32 +1,132 @@
 [
   {
-    "term": "Gutenberg block",
-    "eli5": "A building block you click into a web page, like a Lego brick that does one job.",
-    "english": "A piece of content you add to a WordPress page in the block editor. This plugin adds one block, the weather rating.",
-    "dev": "A WordPress block-editor block; here a dynamic block rendered server-side by render.php."
+    "term": "WordPress",
+    "explainer": true,
+    "eli5": "The program that runs a website. You log in to a control room, write pages there, and visitors see the finished pages.",
+    "english": "The content management system your site runs on. This plugin only works inside it.",
+    "dev": "PHP CMS. The plugin needs WordPress 6.4+ and PHP 7.4+."
+  },
+  {
+    "term": "plugin",
+    "explainer": true,
+    "eli5": "An add-on that teaches WordPress a new trick, like an app on a phone.",
+    "english": "An installable add-on for WordPress. This one adds a weather block and a settings page.",
+    "dev": "A PHP package loaded from wp-content/plugins; here a single main file plus compiled block files."
+  },
+  {
+    "term": "block",
+    "explainer": true,
+    "eli5": "A Lego brick for a page. A paragraph is a block, a picture is a block, and this plugin adds a weather block.",
+    "english": "A piece of content you add to a page in the WordPress editor. This plugin adds one, called Dog Park Weather Rating.",
+    "dev": "A block-editor block, registered from build/block.json and rendered on the server by render.php (a dynamic block)."
+  },
+  {
+    "term": "dashboard",
+    "eli5": "The control room of your website, where you log in to change things.",
+    "english": "The WordPress admin area (wp-admin) where you manage the site.",
+    "dev": "wp-admin; the settings page is registered with add_options_page under Settings."
+  },
+  {
+    "term": "Open-Meteo",
+    "eli5": "A free weather website. It needs no account and no password.",
+    "english": "A free weather service that needs no account or key. It is the default source.",
+    "dev": "open-meteo.com forecast API; keyless; the plugin reads hourly data plus daily sunrise and sunset."
+  },
+  {
+    "term": "API key",
+    "explainer": true,
+    "eli5": "A secret code that proves to a company that it is really you asking, a bit like a library card. Keep it private.",
+    "english": "A private code from a service that lets your site use it. Only needed if you switch to Google Weather or OpenWeather.",
+    "dev": "Credential sent with the provider request; stored in the telex_dpw_api_providers option as plain text."
+  },
+  {
+    "term": "latitude",
+    "eli5": "One of two numbers that say where a place is on Earth, how far north or south.",
+    "english": "The north-south coordinate of the park. Longitude is the east-west one.",
+    "dev": "Stored as a text string per park; must be numeric or /weather returns 400."
+  },
+  {
+    "term": "longitude",
+    "eli5": "The second of the two numbers that say where a place is, how far east or west.",
+    "english": "The east-west coordinate of the park.",
+    "dev": "Stored as a text string per park, together with latitude."
+  },
+  {
+    "term": "UV",
+    "eli5": "How strongly the sun can burn skin. Higher numbers mean stronger sun.",
+    "english": "The UV index. High values lower the score; shade at the park halves that penalty.",
+    "dev": "uv_index from the provider; penalty bands above 4, 6 and 8, softened by cloud cover."
+  },
+  {
+    "term": "Beaufort",
+    "eli5": "A 0 to 12 scale for how strong the wind is, from calm to hurricane.",
+    "english": "A standard wind-strength scale. The block shows it as B and a number.",
+    "dev": "telex_dpw_kmh_to_beaufort and the same table in view.js map km/h to 0 to 12."
+  },
+  {
+    "term": "feels-like",
+    "eli5": "How warm or cold it seems to your body, once humidity and wind are counted.",
+    "english": "The temperature after humidity and wind are taken into account. The rating uses this, not the thermometer.",
+    "dev": "Apparent temperature AT = T + 0.33*e - 0.7*(wind m/s) - 4, with e from humidity (default 50 percent)."
+  },
+  {
+    "term": "weights",
+    "eli5": "Dials that say how much each kind of weather matters to you.",
+    "english": "The six numbers on the Weights tab. 0 ignores a condition, 1 is normal, 5 makes it count a lot.",
+    "dev": "The telex_dpw_weights option, six floats clamped to 0 to 5, multiplied into each penalty."
+  },
+  {
+    "term": "mitigation",
+    "eli5": "Something good about a park that makes bad weather hurt less, like shade or a roof.",
+    "english": "One of four ticks on a park (drainage, shade, wind shelter, covered areas) that halves the matching penalty.",
+    "dev": "Boolean flags drainage, shade, wind_shelter, covered on each park entry."
   },
   {
     "term": "WP-Cron",
     "eli5": "WordPress's little alarm clock that runs chores on a schedule.",
-    "english": "WordPress's built-in scheduler. Here it refreshes the weather twice a day.",
-    "dev": "WordPress pseudo-cron, triggered on page loads; schedules the twice-daily forecast refresh."
+    "english": "WordPress's built-in scheduler. Here it refreshes the weather twice a day. It only runs when someone visits.",
+    "dev": "Pseudo-cron triggered on page loads; hook telex_dpw_refresh_weather on the telex_dpw_twicedaily (12 h) schedule."
   },
   {
-    "term": "Open-Meteo",
-    "eli5": "A free website that knows the weather.",
-    "english": "A free weather service that needs no account or key. It is the default source.",
-    "dev": "Open-Meteo forecast API; keyless; supplies hourly data plus sunrise and sunset."
+    "term": "transient",
+    "eli5": "A note WordPress keeps for a while and then throws away.",
+    "english": "Temporary saved data in WordPress. Here it holds each park's forecast for 15 hours.",
+    "dev": "set_transient with key telex_dpw_weather_ plus md5 of lat_lon, TTL 15 hours."
+  },
+  {
+    "term": "cache",
+    "eli5": "A quick saved copy kept so things load faster.",
+    "english": "A saved copy of something so it does not have to be rebuilt every time. Page-cache add-ons can make a change look like it did not happen.",
+    "dev": "Two layers matter here: the forecast transient, and any page or object cache in front of PHP."
+  },
+  {
+    "term": "REST",
+    "eli5": "A way for one program to ask another program for information over the web.",
+    "english": "The route your visitors' browsers use to fetch the saved forecast from your own site.",
+    "dev": "WordPress REST API, namespace telex-dpw/v1 with public GET routes /parks, /settings and /weather."
+  },
+  {
+    "term": "CSV",
+    "eli5": "A table written as plain text, one row per line, with commas between the columns.",
+    "english": "A plain-text table. Download a sheet as CSV to import parks from it.",
+    "dev": "Parsed with str_getcsv; headers lower-cased and matched against a list of accepted names."
   },
   {
     "term": "Lottie",
     "eli5": "A tiny animated picture that can change colour.",
-    "english": "A small animation file format. The plugin uses it for animated paw and weather icons.",
-    "dev": "JSON-based vector animation format; recoloured at render time from the Appearance settings."
+    "english": "A small animation file format. The plugin can use it for animated icons if you provide them.",
+    "dev": "JSON vector animation; rendered by lottie-web 5.12.2 loaded from cdnjs when a Lottie icon is configured."
   },
   {
-    "term": "Transient",
-    "eli5": "A note WordPress keeps for a while and then throws away.",
-    "english": "Temporary saved data in WordPress. Here it holds each park's cached forecast.",
-    "dev": "WordPress transient (cache entry with expiry) holding per-park weather."
+    "term": "DeepL",
+    "eli5": "A website that translates words from one language to another.",
+    "english": "A translation service. An optional key makes the auto-translate button use it instead of the free fallback.",
+    "dev": "api-free.deepl.com, then api.deepl.com; key stored in the telex_dpw_deepl_key option."
+  },
+  {
+    "term": "WMO weather code",
+    "eli5": "A number that stands for a kind of weather, like 0 for clear sky.",
+    "english": "A standard numeric code for weather types. The plugin turns other providers' types into these.",
+    "dev": "Open-Meteo's weather_code; 95 to 99 are treated as severe (storm)."
   }
 ]
